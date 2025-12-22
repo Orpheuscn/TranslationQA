@@ -27,6 +27,7 @@ const skipEl = document.getElementById('skip');
 const winEl = document.getElementById('win');
 const scoreThresholdEl = document.getElementById('scoreThreshold');
 const useMinSimilarityEl = document.getElementById('useMinSimilarity');
+const autoSplitNMEl = document.getElementById('autoSplitNM');
 
 // 高级设置展开/隐藏
 toggleAdvancedBtn.addEventListener('click', () => {
@@ -70,7 +71,8 @@ checkBtn.addEventListener('click', async () => {
                 skip: parseFloat(skipEl.value),
                 win: parseInt(winEl.value),
                 score_threshold: parseFloat(scoreThresholdEl.value),
-                use_min_similarity: useMinSimilarityEl.checked
+                use_min_similarity: useMinSimilarityEl.checked,
+                auto_split_nm: autoSplitNMEl.checked
             })
         });
         

@@ -26,21 +26,8 @@
                     <textarea id="targetText" placeholder="请输入译文..."></textarea>
                 </div>
 
-                <!-- 参数设置 -->
-                <div class="settings">
-                    <h3>⚙️ 参数设置</h3>
-                    <div class="settings-row">
-                        <div class="setting-item">
-                            <label for="similarityThreshold">相似度阈值 (Similarity Threshold)</label>
-                            <input type="number" id="similarityThreshold" value="0.7" min="0" max="1" step="0.05">
-                            <span class="hint">低于此值视为"相似度低"</span>
-                        </div>
-                        <div class="setting-item">
-                            <label for="forceSplitThreshold">强制拆散阈值 (Force Split Threshold)</label>
-                            <input type="number" id="forceSplitThreshold" value="0.5" min="0" max="1" step="0.05">
-                            <span class="hint">低于此值的对齐组将被拆散为缺失+增添</span>
-                        </div>
-                    </div>
+                
+                    
 
                     <!-- 高级设置 -->
                     <div class="advanced-settings">
@@ -49,6 +36,21 @@
                         </button>
 
                         <div id="advancedPanel" class="advanced-panel" style="display: none;">
+                            <h4>质量检测参数</h4>
+                            <div class="settings-row">
+                                <div class="setting-item">
+                                    <label for="similarityThreshold">相似度阈值 (Similarity Threshold)</label>
+                                    <input type="number" id="similarityThreshold" value="0.7" min="0" max="1" step="0.05">
+                                    <span class="hint">低于此值视为"相似度低"</span>
+                                </div>
+                                <div class="setting-item">
+                                    <label for="forceSplitThreshold">强制拆散阈值 (Force Split Threshold)</label>
+                                    <input type="number" id="forceSplitThreshold" value="0.5" min="0" max="1" step="0.05">
+                                    <span class="hint">低于此值的对齐组将被拆散为缺失+增添</span>
+                                </div>
+                            </div>
+
+                            <h4>Bertalign 对齐参数</h4>
                             <div class="settings-row">
                                 <div class="setting-item">
                                     <label for="maxAlign">最大对齐数 (Max Align)</label>
@@ -81,6 +83,10 @@
                                     <input type="number" id="scoreThreshold" value="0.0" min="0" max="1" step="0.05">
                                     <span class="hint">Bertalign的分数阈值</span>
                                 </div>
+                            </div>
+
+                            <h4>高级功能</h4>
+                            <div class="settings-row">
                                 <div class="setting-item">
                                     <label for="useMinSimilarity">使用最小相似度</label>
                                     <div class="checkbox-wrapper">
@@ -88,10 +94,17 @@
                                         <span class="hint">N:M对齐时使用最小相似度（更严格）</span>
                                     </div>
                                 </div>
+                                <div class="setting-item">
+                                    <label for="autoSplitNM">自动拆散N:M对齐</label>
+                                    <div class="checkbox-wrapper">
+                                        <input type="checkbox" id="autoSplitNM" checked>
+                                        <span class="hint">如果拆散后的1:1相似度更高，则自动拆散N:N对齐</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                
 
                 <!-- 检测按钮 -->
                 <button id="checkBtn" class="check-btn">
