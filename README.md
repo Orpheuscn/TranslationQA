@@ -10,18 +10,27 @@
 ### 快速开始
 
 ```bash
-# 1. 安装依赖
+# 1. 克隆仓库
+git clone <repository-url>
+cd 语义对齐
+
+# 2. 安装依赖
 pip install -r requirements.txt
 
-# 2. 下载 spaCy 模型（可选，用于韩语支持）
+# 3. 下载 LaBSE ONNX 模型（必需，约 1.8GB）
+python download_models.py
+
+# 4. 下载 spaCy 模型（可选，用于韩语支持）
 python -m spacy download ko_core_news_sm
 
-# 3. 启动服务器
+# 5. 启动服务器
 python app.py
 
-# 4. 访问网页
+# 6. 访问网页
 # 打开浏览器访问: http://localhost:5001
 ```
+
+> **⚠️ 重要**: LaBSE 模型文件约 1.8GB，未包含在 git 仓库中，需要单独下载。详见 [labse_onnx/README.md](labse_onnx/README.md)
 
 ---
 
@@ -29,6 +38,8 @@ python app.py
 
 - **[项目介绍](docs/项目介绍.md)** - 项目背景、核心技术、核心功能、使用场景
 - **[参数说明](docs/参数说明.md)** - 所有参数的详细说明、推荐配置、调优建议
+- **[清理Git仓库](docs/清理Git仓库.md)** - 清理 git 仓库大文件的方法
+- **[模型下载说明](labse_onnx/README.md)** - LaBSE ONNX 模型下载指南
 - **[WEB_README.md](WEB_README.md)** - Web 版详细说明
 
 ---
