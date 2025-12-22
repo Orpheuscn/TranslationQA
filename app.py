@@ -9,12 +9,14 @@ from flask_cors import CORS
 import os
 import sys
 from translation_qa_tool import TranslationQA
+from word_aligner import WordAligner
 
 app = Flask(__name__)
 CORS(app)  # 允许跨域请求
 
 # 全局QA工具实例（复用以提高性能）
 qa_tool = None
+word_aligner = None
 
 
 def get_qa_tool():
@@ -34,6 +36,16 @@ def get_qa_tool():
         )
         print("✓ 工具初始化完成")
     return qa_tool
+
+
+def get_word_aligner():
+    """获取或初始化词对齐器实例"""
+    global word_aligner
+    if word_aligner is None:
+        print("初始化词对齐器...")
+        word_aligner = WordAligner()
+        print("✓ 词对齐器初始化完成")
+    return word_aligner
 
 
 @app.route('/')
@@ -173,9 +185,13 @@ def check_translation():
                 src_idx = src_indices[i] if i < len(src_indices) else ""
                 tgt_idx = tgt_indices[i] if i < len(tgt_indices) else ""
 
-                # 每一行都显示相似度和异常（N:M对齐的所有行共享同一个相似度）
-                sim_str = f"{similarity:.4f}" if similarity is not None else ""
-                exc_str = exception
+                # 只有第一行显示相似度和异常情况
+                if i == 0:
+                    sim_str = f"{similarity:.4f}" if similarity is not None else ""
+                    exc_str = exception
+                else:
+                    sim_str = ""
+                    exc_str = exception if exception != "OK" else ""
 
                 # 🔴 修复: 为了保持N:M对齐的多行在一起，使用子排序键
                 # sort_key相同时，按i排序
@@ -271,6 +287,85 @@ def health_check():
         'status': 'ok',
         'model_loaded': qa_tool is not None
     })
+
+
+@app.route('/api/word-align', methods=['POST'])
+def word_align():
+    """
+    词对齐API
+
+    请求体:
+    {
+        "source_text": "源句子",
+        "target_text": "目标句子",
+        "source_lang": "en",  // 可选
+        "target_lang": "zh"   // 可选
+    }
+
+    返回:
+    {
+        "success": true,
+        "data": {
+            "csv": "CSV格式的词对齐结果",
+            "alignments": [...]
+        }
+    }
+    """
+    try:
+        # 获取请求数据
+        data = request.get_json()
+
+        if not data:
+            return jsonify({
+                'success': False,
+                'error': '请求数据为空'
+            }), 400
+
+        source_text = data.get('source_text', '').strip()
+        target_text = data.get('target_text', '').strip()
+
+        if not source_text or not target_text:
+            return jsonify({
+                'success': False,
+                'error': '源文本和目标文本不能为空'
+            }), 400
+
+        source_lang = data.get('source_lang', 'auto')
+        target_lang = data.get('target_lang', 'auto')
+
+        # 获取词对齐器
+        aligner = get_word_aligner()
+
+        # 执行词对齐
+        print(f"\n执行词对齐...")
+        print(f"  源文本: {source_text}")
+        print(f"  目标文本: {target_text}")
+        print(f"  源语言: {source_lang}")
+        print(f"  目标语言: {target_lang}")
+
+        alignments = aligner.align_words(source_text, target_text, source_lang, target_lang)
+        csv_lines = aligner.align_words_to_csv(source_text, target_text, source_lang, target_lang)
+
+        print(f"✓ 词对齐完成: {len(alignments)} 个词对")
+        if alignments:
+            print(f"  前3个对齐: {alignments[:3]}")
+
+        return jsonify({
+            'success': True,
+            'data': {
+                'csv': '\n'.join(csv_lines),
+                'alignments': alignments
+            }
+        })
+
+    except Exception as e:
+        print(f"词对齐错误: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
 
 if __name__ == '__main__':

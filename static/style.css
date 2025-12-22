@@ -402,6 +402,112 @@ header h1 {
     color: #333;
 }
 
+/* 词对齐按钮 */
+.word-align-btn {
+    padding: 6px 12px;
+    background: #9b59b6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.word-align-btn:hover {
+    background: #8e44ad;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(155, 89, 182, 0.3);
+}
+
+.word-align-btn:active {
+    transform: translateY(0);
+}
+
+/* 词对齐结果行 */
+.word-align-row {
+    background: #f8f9fa;
+}
+
+.word-align-container {
+    padding: 20px;
+    background: #ffffff;
+    border-left: 4px solid #9b59b6;
+    margin: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.word-align-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.word-align-header h4 {
+    color: #9b59b6;
+    font-size: 16px;
+    margin: 0;
+}
+
+.close-word-align-btn {
+    padding: 5px 12px;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.close-word-align-btn:hover {
+    background: #c0392b;
+}
+
+/* 词对齐表格 */
+.word-align-table {
+    overflow-x: auto;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.word-align-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.word-align-table th {
+    background: #9b59b6;
+    color: white;
+    padding: 10px;
+    text-align: left;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.word-align-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.word-align-table tr:nth-child(even) {
+    background: #f8f9fa;
+}
+
+.word-align-table tr:hover {
+    background: #e8e8e8;
+}
+
 @media (max-width: 768px) {
     .settings-row {
         grid-template-columns: 1fr;
@@ -409,6 +515,11 @@ header h1 {
 
     .issues-grid {
         grid-template-columns: 1fr;
+    }
+
+    .word-align-btn {
+        font-size: 11px;
+        padding: 5px 10px;
     }
 }
 
