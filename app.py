@@ -113,6 +113,7 @@ def check_translation():
         win = data.get('win', 5)
         score_threshold = data.get('score_threshold', 0.0)
         use_min_similarity = data.get('use_min_similarity', True)
+        auto_split_nm = data.get('auto_split_nm', True)  # 默认启用自动拆散
 
         # 更新参数（如果与当前不同）
         tool = get_qa_tool()
@@ -124,6 +125,7 @@ def check_translation():
         tool.win = win
         tool.score_threshold = score_threshold
         tool.use_min_similarity = use_min_similarity
+        tool.auto_split_nm = auto_split_nm
 
         # 执行检查（使用 fastText 自动检测语言）
         print(f"开始检查翻译...")

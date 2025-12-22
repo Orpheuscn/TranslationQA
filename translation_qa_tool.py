@@ -26,7 +26,7 @@ class TranslationQA:
 
     def __init__(self, similarity_threshold=0.7, max_align=6, top_k=5, score_threshold=0.15,
                  skip=-1.0, win=10, auto_detect_language=True,
-                 force_split_threshold=0.5, use_min_similarity=True):
+                 force_split_threshold=0.5, use_min_similarity=True, auto_split_nm=False):
         """
         初始化翻译质量检查工具
 
@@ -40,6 +40,7 @@ class TranslationQA:
             auto_detect_language: 是否自动检测语言（使用 fastText）
             force_split_threshold: 强制拆散阈值，低于此值的对齐组将被拆散为缺失+增添 (默认0.5)
             use_min_similarity: N:M对齐时使用最小相似度而非平均相似度 (默认True，更严格)
+            auto_split_nm: 自动拆散N:M对齐为多个1:1对齐（如果N==M且拆散后相似度更高）(默认False)
         """
         self.similarity_threshold = similarity_threshold
         self.max_align = max_align
@@ -48,6 +49,7 @@ class TranslationQA:
         self.skip = skip
         self.win = win
         self.force_split_threshold = force_split_threshold
+        self.auto_split_nm = auto_split_nm
         self.use_min_similarity = use_min_similarity
 
         # 初始化编码器（用于计算相似度）
@@ -207,7 +209,58 @@ class TranslationQA:
             })
 
         print(f"✓ 相似度计算完成")
-        
+
+        # 步骤2.5: 自动拆散N:M对齐（如果启用）
+        if self.auto_split_nm:
+            print("\n步骤2.5: 检查是否需要拆散N:M对齐...")
+            new_alignment_scores = []
+            split_count = 0
+
+            for item in alignment_scores:
+                if item.get('is_null_alignment', False):
+                    new_alignment_scores.append(item)
+                    continue
+
+                src_indices = item['src_indices']
+                tgt_indices = item['tgt_indices']
+
+                # 只处理N:N对齐（N==M且N>1）
+                if len(src_indices) == len(tgt_indices) and len(src_indices) > 1:
+                    # 计算拆散后的1:1相似度
+                    individual_sims = []
+                    for i in range(len(src_indices)):
+                        src_emb = self.encoder.encode_sentences([item['src_texts'][i]])[0]
+                        tgt_emb = self.encoder.encode_sentences([item['tgt_texts'][i]])[0]
+                        src_emb = src_emb / np.linalg.norm(src_emb)
+                        tgt_emb = tgt_emb / np.linalg.norm(tgt_emb)
+                        sim = float(np.dot(src_emb, tgt_emb))
+                        individual_sims.append(sim)
+
+                    # 如果所有1:1相似度都高于N:N相似度，则拆散
+                    avg_individual_sim = np.mean(individual_sims)
+                    if avg_individual_sim > item['similarity']:
+                        # 拆散为多个1:1对齐
+                        for i in range(len(src_indices)):
+                            new_alignment_scores.append({
+                                'src_indices': [src_indices[i]],
+                                'tgt_indices': [tgt_indices[i]],
+                                'src_texts': [item['src_texts'][i]],
+                                'tgt_texts': [item['tgt_texts'][i]],
+                                'src_text': item['src_texts'][i],
+                                'tgt_text': item['tgt_texts'][i],
+                                'similarity': individual_sims[i],
+                                'is_null_alignment': False
+                            })
+                        split_count += 1
+                    else:
+                        new_alignment_scores.append(item)
+                else:
+                    new_alignment_scores.append(item)
+
+            alignment_scores = new_alignment_scores
+            if split_count > 0:
+                print(f"✓ 拆散了 {split_count} 个N:M对齐")
+
         # 步骤3: 检测异常
         print("\n步骤3: 检测翻译异常...")
 
