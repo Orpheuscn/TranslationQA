@@ -26,8 +26,18 @@
                     <textarea id="targetText" placeholder="请输入译文..."></textarea>
                 </div>
 
-                
-                    
+                <!-- 预设配置 -->
+                <div class="preset-section">
+                    <label for="presetConfig">预设配置 (Preset Configuration)</label>
+                    <select id="presetConfig">
+                        <option value="default">默认配置 (Default)</option>
+                        <option value="literal">直译式翻译 (Literal Translation - 技术文档/新闻)</option>
+                        <option value="rewrite">改写式翻译 (Rewrite Translation - 戏剧/文学)</option>
+                        <option value="high_quality">高质量对齐 (High Quality Alignment)</option>
+                        <option value="fast">快速对齐 (Fast Alignment)</option>
+                    </select>
+                    <span class="hint">选择预设配置将自动设置所有参数</span>
+                </div>
 
                     <!-- 高级设置 -->
                     <div class="advanced-settings">

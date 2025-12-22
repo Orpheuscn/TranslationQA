@@ -4,6 +4,7 @@ let csvData = '';
 // DOM元素
 const sourceTextEl = document.getElementById('sourceText');
 const targetTextEl = document.getElementById('targetText');
+const presetConfigEl = document.getElementById('presetConfig');
 const similarityThresholdEl = document.getElementById('similarityThreshold');
 const forceSplitThresholdEl = document.getElementById('forceSplitThreshold');
 const checkBtn = document.getElementById('checkBtn');
@@ -28,6 +29,86 @@ const winEl = document.getElementById('win');
 const scoreThresholdEl = document.getElementById('scoreThreshold');
 const useMinSimilarityEl = document.getElementById('useMinSimilarity');
 const autoSplitNMEl = document.getElementById('autoSplitNM');
+
+// 预设配置
+const presetConfigs = {
+    default: {
+        similarity_threshold: 0.7,
+        force_split_threshold: 0.5,
+        max_align: 5,
+        top_k: 3,
+        skip: -1.0,
+        win: 5,
+        score_threshold: 0.0,
+        use_min_similarity: true,
+        auto_split_nm: true
+    },
+    literal: {
+        similarity_threshold: 0.7,
+        force_split_threshold: 0.5,
+        max_align: 5,
+        top_k: 3,
+        skip: -1.0,
+        win: 5,
+        score_threshold: 0.0,
+        use_min_similarity: true,
+        auto_split_nm: true
+    },
+    rewrite: {
+        similarity_threshold: 0.6,
+        force_split_threshold: 0.4,
+        max_align: 6,
+        top_k: 3,
+        skip: -1.0,
+        win: 5,
+        score_threshold: 0.0,
+        use_min_similarity: false,
+        auto_split_nm: false
+    },
+    high_quality: {
+        similarity_threshold: 0.7,
+        force_split_threshold: 0.5,
+        max_align: 8,
+        top_k: 5,
+        skip: -1.5,
+        win: 10,
+        score_threshold: 0.0,
+        use_min_similarity: true,
+        auto_split_nm: true
+    },
+    fast: {
+        similarity_threshold: 0.7,
+        force_split_threshold: 0.5,
+        max_align: 3,
+        top_k: 1,
+        skip: -1.0,
+        win: 3,
+        score_threshold: 0.0,
+        use_min_similarity: false,
+        auto_split_nm: false
+    }
+};
+
+// 应用预设配置
+function applyPresetConfig(presetName) {
+    const config = presetConfigs[presetName];
+    if (!config) return;
+
+    similarityThresholdEl.value = config.similarity_threshold;
+    forceSplitThresholdEl.value = config.force_split_threshold;
+    maxAlignEl.value = config.max_align;
+    topKEl.value = config.top_k;
+    skipEl.value = config.skip;
+    winEl.value = config.win;
+    scoreThresholdEl.value = config.score_threshold;
+    useMinSimilarityEl.checked = config.use_min_similarity;
+    autoSplitNMEl.checked = config.auto_split_nm;
+}
+
+// 预设配置选择事件
+presetConfigEl.addEventListener('change', (e) => {
+    applyPresetConfig(e.target.value);
+});
 
 // 高级设置展开/隐藏
 toggleAdvancedBtn.addEventListener('click', () => {

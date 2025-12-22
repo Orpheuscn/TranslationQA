@@ -35,6 +35,10 @@ models/*.bin
 models/*.model
 !models/.gitkeep
 
+# LaBSE ONNX 模型文件（太大，不应提交到 git）
+labse_onnx/
+!labse_onnx/.gitkeep
+
 # Logs
 *.log
 
@@ -45,4 +49,8 @@ test_*.py
 # Temporary files
 *.tmp
 *.bak
+
+# CSV 输出文件
+*.csv
+!example.csv
 

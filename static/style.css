@@ -121,6 +121,56 @@ header h1 {
     margin-top: 5px;
 }
 
+/* 预设配置样式 */
+.preset-section {
+    margin-top: 20px;
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+}
+
+.preset-section label {
+    display: block;
+    color: white;
+    font-weight: 600;
+    margin-bottom: 10px;
+    font-size: 1.05em;
+}
+
+.preset-section select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    font-size: 1em;
+    background: rgba(255, 255, 255, 0.95);
+    color: #333;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 500;
+}
+
+.preset-section select:hover {
+    border-color: rgba(255, 255, 255, 0.6);
+    background: white;
+}
+
+.preset-section select:focus {
+    outline: none;
+    border-color: white;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+.preset-section .hint {
+    display: block;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.9em;
+    margin-top: 8px;
+    font-weight: 400;
+}
+
 /* 高级设置样式 */
 .advanced-settings {
     margin-top: 20px;
