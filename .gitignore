@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# 但是保留修改过的源代码文件
+!patched_packages/
+!venv/lib/python3.12/site-packages/bertalign/encoder.py
+!venv/lib/python3.12/site-packages/bertalign/aligner.py
+!venv/lib/python3.12/site-packages/bertalign/corelib.py
+!venv/lib/python3.12/site-packages/bertalign/utils.py
+!venv/lib/python3.12/site-packages/fasttext/FastText.py
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Models
+models/*.bin
+models/*.model
+!models/.gitkeep
+
+# Logs
+*.log
+
+# Test files
+test_*.py
+!test_requirements.txt
+
+# Temporary files
+*.tmp
+*.bak
+

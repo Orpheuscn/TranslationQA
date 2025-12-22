@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>翻译质量检查工具</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔍 翻译质量检查工具</h1>
+            <p class="subtitle">基于 Bertalign + LaBSE 的语义对齐与异常检测</p>
+        </header>
+
+        <div class="main-content">
+            <!-- 输入区域 -->
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="sourceText">原文 (Source Text)</label>
+                    <textarea id="sourceText" placeholder="请输入原文..."></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label for="targetText">译文 (Target Text)</label>
+                    <textarea id="targetText" placeholder="请输入译文..."></textarea>
+                </div>
+
+                <!-- 参数设置 -->
+                <div class="settings">
+                    <h3>⚙️ 参数设置</h3>
+                    <div class="settings-row">
+                        <div class="setting-item">
+                            <label for="similarityThreshold">相似度阈值 (Similarity Threshold)</label>
+                            <input type="number" id="similarityThreshold" value="0.7" min="0" max="1" step="0.05">
+                            <span class="hint">低于此值视为"相似度低"</span>
+                        </div>
+                        <div class="setting-item">
+                            <label for="forceSplitThreshold">强制拆散阈值 (Force Split Threshold)</label>
+                            <input type="number" id="forceSplitThreshold" value="0.5" min="0" max="1" step="0.05">
+                            <span class="hint">低于此值的对齐组将被拆散为缺失+增添</span>
+                        </div>
+                    </div>
+
+                    <!-- 高级设置 -->
+                    <div class="advanced-settings">
+                        <button type="button" id="toggleAdvanced" class="toggle-advanced-btn">
+                            <span id="toggleIcon">▶</span> 高级设置 (Advanced Settings)
+                        </button>
+
+                        <div id="advancedPanel" class="advanced-panel" style="display: none;">
+                            <div class="settings-row">
+                                <div class="setting-item">
+                                    <label for="maxAlign">最大对齐数 (Max Align)</label>
+                                    <input type="number" id="maxAlign" value="5" min="1" max="10" step="1">
+                                    <span class="hint">N:M对齐中的max(N,M)</span>
+                                </div>
+                                <div class="setting-item">
+                                    <label for="topK">Top-K</label>
+                                    <input type="number" id="topK" value="3" min="1" max="10" step="1">
+                                    <span class="hint">Bertalign的top-k参数</span>
+                                </div>
+                            </div>
+
+                            <div class="settings-row">
+                                <div class="setting-item">
+                                    <label for="skip">跳过惩罚 (Skip Penalty)</label>
+                                    <input type="number" id="skip" value="-0.1" min="-1" max="0" step="0.05">
+                                    <span class="hint">越负越倾向N:M对齐而非缺失/增添</span>
+                                </div>
+                                <div class="setting-item">
+                                    <label for="win">窗口大小 (Window Size)</label>
+                                    <input type="number" id="win" value="5" min="1" max="20" step="1">
+                                    <span class="hint">Bertalign的窗口大小</span>
+                                </div>
+                            </div>
+
+                            <div class="settings-row">
+                                <div class="setting-item">
+                                    <label for="scoreThreshold">分数阈值 (Score Threshold)</label>
+                                    <input type="number" id="scoreThreshold" value="0.0" min="0" max="1" step="0.05">
+                                    <span class="hint">Bertalign的分数阈值</span>
+                                </div>
+                                <div class="setting-item">
+                                    <label for="useMinSimilarity">使用最小相似度</label>
+                                    <div class="checkbox-wrapper">
+                                        <input type="checkbox" id="useMinSimilarity" checked>
+                                        <span class="hint">N:M对齐时使用最小相似度（更严格）</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 检测按钮 -->
+                <button id="checkBtn" class="check-btn">
+                    <span id="btnText">🚀 开始检测</span>
+                    <span id="btnLoading" class="loading" style="display: none;">
+                        <span class="spinner"></span> 检测中...
+                    </span>
+                </button>
+            </div>
+
+            <!-- 结果区域 -->
+            <div id="resultSection" class="result-section" style="display: none;">
+                <h2>📊 检测结果</h2>
+
+                <!-- 摘要信息 -->
+                <div id="summary" class="summary"></div>
+
+                <!-- CSV表格 -->
+                <div class="csv-section">
+                    <h3>📋 详细报告 (CSV格式)</h3>
+                    <div class="table-controls">
+                        <button id="downloadCsvBtn" class="download-btn">💾 下载CSV</button>
+                        <button id="copyTableBtn" class="copy-btn">📋 复制表格</button>
+                    </div>
+                    <div id="csvTable" class="csv-table"></div>
+                </div>
+            </div>
+
+            <!-- 错误提示 -->
+            <div id="errorSection" class="error-section" style="display: none;">
+                <h3>❌ 错误</h3>
+                <pre id="errorMessage"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
+

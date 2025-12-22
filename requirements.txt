@@ -1,0 +1,17 @@
+# 核心依赖
+numpy>=1.24.0
+onnx>=1.14.0
+onnxruntime>=1.15.0
+
+# Bertalign和编码器
+bertalign
+transformers>=4.30.0
+
+# Web服务
+flask>=3.0.0
+flask-cors>=4.0.0
+
+# 高级分句
+spacy>=3.7.0
+hanlp>=2.1.0
+
