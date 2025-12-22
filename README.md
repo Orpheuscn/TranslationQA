@@ -1,6 +1,9 @@
-# 翻译质量检查工具
+# 语义对齐 - 翻译质量检查工具
 
-自动化的翻译质量检查工具，在句子级别上检测缺失、增添和语义歪曲。
+基于深度学习的翻译质量检查工具，支持自动句子对齐、语义相似度计算、翻译异常检测、词对齐等功能。
+
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Python](https://img.shields.io/badge/python-3.12-blue.svg)
 
 ## 🌐 Web版（推荐）
 
@@ -10,28 +13,37 @@
 # 1. 安装依赖
 pip install -r requirements.txt
 
-# 2. 启动服务器
-./start_server.sh
+# 2. 下载 spaCy 模型（可选，用于韩语支持）
+python -m spacy download ko_core_news_sm
 
-# 3. 访问网页
+# 3. 启动服务器
+python app.py
+
+# 4. 访问网页
 # 打开浏览器访问: http://localhost:5001
 ```
 
-详细说明请查看 [WEB_README.md](WEB_README.md)
+---
+
+## 📚 文档
+
+- **[项目介绍](docs/项目介绍.md)** - 项目背景、核心技术、核心功能、使用场景
+- **[参数说明](docs/参数说明.md)** - 所有参数的详细说明、推荐配置、调优建议
+- **[WEB_README.md](WEB_README.md)** - Web 版详细说明
 
 ---
 
-## ✨ 特性
+## ✨ 核心功能
 
-- ✅ **N:M句子对齐**: 使用Bertalign进行多对多语义对齐（支持最多6:6对齐）
-- ✅ **跨语言语义相似度**: 使用LaBSE ONNX模型计算余弦相似度
-- ✅ **三种异常检测**: 缺失、增添、相似度低
-- ✅ **强制拆散功能**: 将低相似度对齐组拆散为缺失+增添
-- ✅ **最小相似度策略**: 避免向量平均掩盖不相关句子
-- ✅ **Web界面**: 友好的网页界面，实时检测，导出CSV
-- ✅ **自动分句**: 支持spaCy、HanLP或简单规则分句
-- ✅ **多格式报告**: JSON和CSV格式，CSV按源索引排序便于审查
-- ✅ **macOS ARM64兼容**: 已修补Bertalign，避免Segmentation fault
+- 🔗 **自动句子对齐**: 使用 Bertalign + LaBSE 自动对齐原文和译文，支持 N:M 对齐
+- 📊 **语义相似度计算**: 使用 LaBSE 计算句子对的语义相似度，量化翻译质量
+- 🔍 **翻译异常检测**: 自动检测缺失 (Omission)、增添 (Addition)、相似度低等问题
+- 🔤 **词对齐**: 点击句子对查看词级别的对齐和相似度
+- 🌍 **多语言支持**: 支持 100+ 种语言，包括拉丁语、古希腊语等古典语言
+- ⚙️ **灵活参数配置**: 9 个可调参数，适应不同翻译场景（直译式、改写式等）
+- 🎨 **友好的 Web 界面**: 响应式设计，颜色编码的异常标记，可折叠的高级设置
+- 📁 **多格式报告**: JSON 和 CSV 格式，CSV 按源索引排序便于审查
+- 🍎 **macOS ARM64 兼容**: 使用 ONNX 版本的 LaBSE，避免 Segmentation fault
 
 ## 🚀 Python API使用
 
@@ -149,16 +161,50 @@ for src, tgt in document_pairs:
 
 ## 🔧 参数说明
 
-### Bertalign参数（已优化）
+本工具提供 **9 个可调参数**，分为三类：
 
-- `max_align=6`: 支持最多6:6的复杂对齐（如4:2, 3:3等）
-- `skip=-1.0`: 强惩罚"跳过"，使算法倾向于N:M对齐而非缺失
-- `top_k=5`: 增加候选数，提高对齐质量
-- `win=10`: 扩大搜索窗口，捕捉更远距离的对齐
+### 质量检测参数
+- `similarity_threshold` (默认 0.7): 相似度阈值，低于此值标记为"相似度低"
+- `force_split_threshold` (默认 0.5): 强制拆散阈值，低于此值拆散为缺失+增添
 
-### 相似度阈值
+### Bertalign 对齐参数
+- `max_align` (默认 5): N:M 对齐中的 max(N,M)
+- `top_k` (默认 3): Bertalign 的 top-k 参数
+- `skip` (默认 -1.0): 跳过惩罚，越负越倾向 N:M 对齐
+- `win` (默认 5): 窗口大小
+- `score_threshold` (默认 0.0): Bertalign 的分数阈值
 
-- `similarity_threshold=0.7`: 低于此值的对齐被标记为"相似度低"
+### 高级功能
+- `use_min_similarity` (默认 True): N:M 对齐时使用最小相似度（更严格）
+- `auto_split_nm` (默认 True): 自动拆散不合理的 N:N 对齐
+
+**详细说明**: 参见 [参数说明文档](docs/参数说明.md)
+
+---
+
+## 🎯 推荐配置
+
+### 直译式翻译（技术文档、新闻）
+
+```python
+qa_tool = TranslationQA(
+    similarity_threshold=0.7,
+    force_split_threshold=0.5,
+    auto_split_nm=True
+)
+```
+
+### 改写式翻译（戏剧、文学）
+
+```python
+qa_tool = TranslationQA(
+    similarity_threshold=0.6,
+    force_split_threshold=0.4,
+    auto_split_nm=False
+)
+```
+
+**更多配置**: 参见 [参数说明文档](docs/参数说明.md)
 
 ## 📁 文件结构
 
