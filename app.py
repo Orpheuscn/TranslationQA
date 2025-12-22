@@ -109,7 +109,7 @@ def check_translation():
         # 获取高级参数
         max_align = data.get('max_align', 5)
         top_k = data.get('top_k', 3)
-        skip = data.get('skip', -0.1)
+        skip = data.get('skip', -1.0)
         win = data.get('win', 5)
         score_threshold = data.get('score_threshold', 0.0)
         use_min_similarity = data.get('use_min_similarity', True)
