@@ -11,36 +11,44 @@
 
 ```bash
 # 1. 克隆仓库
-git clone <repository-url>
-cd 语义对齐
+git clone https://github.com/Orpheuscn/TranslationQA.git
+cd TranslationQA
 
-# 2. 安装依赖
+# 2. 创建虚拟环境
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# 3. 安装修补过的依赖包（重要！）
+pip install patched_packages/dist/bertalign_macos_patched-0.1.0.post1-py3-none-any.whl
+pip install patched_packages/dist/fasttext_numpy2_patched-0.9.3.post1-py3-none-any.whl
+
+# 4. 安装其他依赖
 pip install -r requirements.txt
 
-# 3. 下载 LaBSE ONNX 模型（必需，约 1.8GB）
+# 5. 下载 LaBSE ONNX 模型（必需，约 1.8GB）
 python download_models.py
 
-# 4. 下载 spaCy 模型（可选，用于韩语支持）
+# 6. 下载 spaCy 模型（可选，用于韩语支持）
 python -m spacy download ko_core_news_sm
 
-# 5. 启动服务器
+# 7. 启动服务器
 python app.py
 
-# 6. 访问网页
+# 8. 访问网页
 # 打开浏览器访问: http://localhost:5001
 ```
 
-> **⚠️ 重要**: LaBSE 模型文件约 1.8GB，未包含在 git 仓库中，需要单独下载。详见 [labse_onnx/README.md](labse_onnx/README.md)
+> **⚠️ 重要**: 
+> - 本项目使用了修补过的 `bertalign` 和 `fasttext` 包，必须按照上述步骤安装
+> - LaBSE 模型文件约 1.8GB，未包含在 git 仓库中，需要单独下载
+> - 详细安装说明请参考 [INSTALL.md](INSTALL.md)
 
 ---
 
 ## 📚 文档
 
-- **[项目介绍](docs/项目介绍.md)** - 项目背景、核心技术、核心功能、使用场景
-- **[参数说明](docs/参数说明.md)** - 所有参数的详细说明、推荐配置、调优建议
-- **[清理Git仓库](docs/清理Git仓库.md)** - 清理 git 仓库大文件的方法
-- **[模型下载说明](labse_onnx/README.md)** - LaBSE ONNX 模型下载指南
-- **[WEB_README.md](WEB_README.md)** - Web 版详细说明
+- **[安装指南](INSTALL.md)** - 详细的安装步骤和常见问题
+- **[修补包说明](patched_packages/README.md)** - 为什么需要修补版的依赖包
 
 ---
 
@@ -221,32 +229,42 @@ qa_tool = TranslationQA(
 
 ```
 .
-├── translation_qa_tool.py      # 主工具
-├── labse_onnx_encoder.py       # LaBSE ONNX编码器
+├── app.py                      # Flask Web 服务器
+├── translation_qa_tool.py      # 主工具类
+├── labse_onnx_encoder.py       # LaBSE ONNX 编码器
 ├── text_splitter.py            # 文本分句模块
-├── test.py                     # 测试脚本
-├── labse_onnx/                 # LaBSE ONNX模型
-├── venv/                       # 虚拟环境（已修补Bertalign）
+├── word_aligner.py             # 词对齐模块
+├── language_detector.py        # 语言检测模块
+├── download_models.py          # 模型下载脚本
+├── requirements.txt            # Python 依赖
+├── patched_packages/           # 修补过的依赖包
+│   ├── dist/                   # 打包好的 wheel 文件
+│   └── README.md               # 修补包说明
+├── static/                     # Web 前端资源
+├── templates/                  # HTML 模板
+├── labse_onnx/                 # LaBSE ONNX 模型（需下载）
+├── models/                     # FastText 语言检测模型
 ├── README.md                   # 本文件
-├── README_FINAL.md             # 详细使用文档
-├── 工作流总结.md                # 工作流程说明
-├── 优化总结.md                  # 优化过程总结
-└── 最终修复总结.md              # 致命问题修复总结
+└── INSTALL.md                  # 安装指南
 ```
 
 ## 🐛 已修复的问题
 
-### 🔴 致命问题
+### macOS ARM64 兼容性问题
 
-1. **空对齐被错误归类**: 修复了Bertalign返回空对齐时被归类为"相似度低"的问题
-2. **CSV排序混乱**: 修复了缺失/增添被追加到最后，破坏上下文的问题
+1. **SentenceTransformer 崩溃**: 使用 ONNX Runtime 替代，避免 Segmentation fault
+2. **FAISS 批量搜索挂起**: 使用逐个搜索的 workaround
+3. **Google Translate API 超时**: 添加可选的语言参数
 
-### 🟠 次要问题
+### NumPy 2.x 兼容性问题
 
-3. **N:M对齐过于保守**: 通过参数调优，支持更复杂的对齐
-4. **CSV多行平铺**: 修复了N:M对齐展开逻辑
+4. **FastText 弃用警告**: 修复 `np.array(copy=False)` 为 `np.asarray()`
 
-详见 `最终修复总结.md`
+### 翻译质量检测问题
+
+5. **空对齐被错误归类**: 修复了 Bertalign 返回空对齐时被归类为"相似度低"的问题
+6. **CSV 排序混乱**: 修复了缺失/增添被追加到最后，破坏上下文的问题
+7. **N:M 对齐过于保守**: 通过参数调优，支持更复杂的对齐
 
 ## 📚 技术栈
 

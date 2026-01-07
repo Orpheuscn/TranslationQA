@@ -54,3 +54,6 @@ test_*.py
 *.csv
 !example.csv
 
+# 文档文件夹（开发笔记，不需要提交）
+docs/
+
