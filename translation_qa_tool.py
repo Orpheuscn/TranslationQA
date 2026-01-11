@@ -19,6 +19,10 @@ from datetime import datetime
 from bertalign import Bertalign
 from labse_onnx_encoder import LaBSEOnnxEncoder
 from text_splitter import TextSplitter
+from model_config import setup_hanlp_env
+
+# 设置 HanLP 环境变量（使用本地模型）
+setup_hanlp_env()
 
 
 class TranslationQA:

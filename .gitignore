@@ -33,6 +33,7 @@ Thumbs.db
 # Models
 models/*.bin
 models/*.model
+models/hanlp/
 !models/.gitkeep
 
 # LaBSE ONNX 模型文件（太大，不应提交到 git）
@@ -56,4 +57,3 @@ test_*.py
 
 # 文档文件夹（开发笔记，不需要提交）
 docs/
-

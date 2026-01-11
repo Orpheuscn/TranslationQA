@@ -45,18 +45,26 @@ pip install patched_packages/dist/fasttext_numpy2_patched-0.9.3.post1-py3-none-a
 pip install -r requirements.txt
 ```
 
-### 5. 下载模型文件
+### 5. 下载 LaBSE ONNX 模型
 
-**LaBSE ONNX 模型**（必需，约 1.8GB）：
+**LaBSE ONNX 模型**（必需，约 470MB）：
 
 ```bash
 python download_models.py
 ```
 
-**spaCy 韩语模型**（可选）：
+**spaCy 语言模型**（可选，用于特定语言的分句和分词）：
 
 ```bash
+# 日语（推荐，如果处理日文文本）
+python -m spacy download ja_ginza
+
+# 韩语
 python -m spacy download ko_core_news_sm
+
+# 其他语言根据需要下载
+# python -m spacy download en_core_web_sm  # 英语
+# python -m spacy download fr_core_news_sm  # 法语
 ```
 
 ### 6. 启动 Web 服务
@@ -64,6 +72,11 @@ python -m spacy download ko_core_news_sm
 ```bash
 python app.py
 ```
+
+**首次启动说明**：
+- fastText 语言检测模型（~125MB）会自动下载到 `models/lid.176.bin`
+- HanLP 中文模型（~171MB）会自动下载到 `models/hanlp/`
+- 下载过程可能需要几分钟，取决于网络速度
 
 然后在浏览器中访问: http://localhost:5001
 
@@ -89,8 +102,11 @@ python app.py
 # 验证 Python 包
 python -c "import bertalign; import fasttext; print('✓ 修补包安装成功')"
 
-# 验证 ONNX 模型
-python -c "import os; print('✓ ONNX 模型已下载' if os.path.exists('labse_onnx/model.onnx') else '✗ 请运行 download_models.py')"
+# 验证 LaBSE ONNX 模型
+python -c "import os; print('✓ LaBSE ONNX 模型已下载' if os.path.exists('labse_onnx/model.onnx') else '✗ 请运行 download_models.py')"
+
+# 验证模型配置
+python model_config.py
 ```
 
 ## 常见问题
@@ -105,9 +121,14 @@ A: 可以。修补版在所有平台上都能正常工作，不仅限于 macOS A
 
 ### Q: 模型文件太大怎么办？
 
-A: 模型文件约 1.8GB，是必需的。如果网络不好，可以尝试：
-- 使用国内镜像（如果 `download_models.py` 支持）
-- 手动下载后放到 `labse_onnx/` 目录
+A: 程序使用的模型总计约 766MB：
+- LaBSE ONNX: ~470MB（必需，需手动下载）
+- fastText: ~125MB（首次运行时自动下载）
+- HanLP: ~171MB（首次使用中文时自动下载）
+
+如果网络不好，可以尝试：
+- LaBSE 模型：使用国内镜像或手动下载后放到 `labse_onnx/` 目录
+- 其他模型：首次运行时会自动下载，如果失败会提示手动下载链接
 
 ### Q: 如何更新依赖？
 
@@ -136,9 +157,9 @@ python -m pytest tests/
 deactivate
 
 # 删除虚拟环境和模型文件
-rm -rf venv/
-rm -rf labse_onnx/
-rm -rf models/
+rm -rf venv/              # 虚拟环境和 spaCy 模型
+rm -rf labse_onnx/        # LaBSE ONNX 模型 (~470MB)
+rm -rf models/            # fastText 和 HanLP 模型 (~296MB)
 ```
 
 ## 技术支持

@@ -11,6 +11,10 @@
 
 import re
 from language_detector import LanguageDetector
+from model_config import setup_hanlp_env
+
+# 设置 HanLP 环境变量（使用本地模型）
+setup_hanlp_env()
 
 
 class TextSplitter:

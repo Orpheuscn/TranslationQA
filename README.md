@@ -28,10 +28,14 @@ pip install -r requirements.txt
 # 5. 下载 LaBSE ONNX 模型（必需，约 1.8GB）
 python download_models.py
 
-# 6. 下载 spaCy 模型（可选，用于韩语支持）
+# 6. 下载 spaCy 模型（可选，用于多语言支持）
+# 日语（推荐）
+python -m spacy download ja_ginza
+# 韩语
 python -m spacy download ko_core_news_sm
+# 其他语言根据需要下载
 
-# 7. 启动服务器
+# 7. 启动服务器（首次启动会自动下载其他模型）
 python app.py
 
 # 8. 访问网页
@@ -41,6 +45,7 @@ python app.py
 > **⚠️ 重要**: 
 > - 本项目使用了修补过的 `bertalign` 和 `fasttext` 包，必须按照上述步骤安装
 > - LaBSE 模型文件约 1.8GB，未包含在 git 仓库中，需要单独下载
+> - fastText 语言检测模型（125MB）和 HanLP 中文模型（171MB）会在首次运行时自动下载到 `models/` 文件夹
 > - 详细安装说明请参考 [INSTALL.md](INSTALL.md)
 
 ---
@@ -235,18 +240,30 @@ qa_tool = TranslationQA(
 ├── text_splitter.py            # 文本分句模块
 ├── word_aligner.py             # 词对齐模块
 ├── language_detector.py        # 语言检测模块
-├── download_models.py          # 模型下载脚本
+├── model_config.py             # 模型路径统一配置
+├── download_models.py          # LaBSE 模型下载脚本
 ├── requirements.txt            # Python 依赖
 ├── patched_packages/           # 修补过的依赖包
 │   ├── dist/                   # 打包好的 wheel 文件
 │   └── README.md               # 修补包说明
 ├── static/                     # Web 前端资源
 ├── templates/                  # HTML 模板
-├── labse_onnx/                 # LaBSE ONNX 模型（需下载）
-├── models/                     # FastText 语言检测模型
+├── labse_onnx/                 # LaBSE ONNX 模型（需手动下载，~470MB）
+├── models/                     # 其他模型文件（自动下载）
+│   ├── lid.176.bin             # fastText 语言检测模型（~125MB）
+│   └── hanlp/                  # HanLP 中文分词/分句模型（~171MB）
 ├── README.md                   # 本文件
 └── INSTALL.md                  # 安装指南
 ```
+
+### 模型说明
+
+| 模型 | 大小 | 位置 | 下载方式 |
+|------|------|------|----------|
+| LaBSE ONNX | ~470 MB | `labse_onnx/` | 手动：`python download_models.py` |
+| fastText | ~125 MB | `models/lid.176.bin` | 自动：首次运行时下载 |
+| HanLP | ~171 MB | `models/hanlp/` | 自动：首次使用时下载 |
+| spaCy 模型 | ~50-600 MB | 虚拟环境 | 手动：`python -m spacy download <model>` |
 
 ## 🐛 已修复的问题
 

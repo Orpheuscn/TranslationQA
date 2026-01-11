@@ -8,6 +8,11 @@ from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import os
 import sys
+from model_config import setup_hanlp_env
+
+# 设置 HanLP 环境变量（优先使用本地模型）
+setup_hanlp_env()
+
 from translation_qa_tool import TranslationQA
 from word_aligner import WordAligner
 
