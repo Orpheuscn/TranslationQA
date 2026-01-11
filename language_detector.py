@@ -99,6 +99,15 @@ class LanguageDetector:
             print(f"✗ 模型加载失败: {e}")
             raise
     
+    def is_available(self):
+        """
+        检查模型是否可用
+        
+        返回:
+            bool: 模型已加载且可用返回 True，否则返回 False
+        """
+        return self.model is not None
+    
     def detect(self, text, k=1):
         """
         检测文本的语言
