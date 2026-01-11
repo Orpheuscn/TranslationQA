@@ -21,7 +21,7 @@ echo "✓ Python 版本: $PYTHON_VERSION"
 echo ""
 
 # 步骤 1: 创建虚拟环境
-echo "步骤 1/6: 创建虚拟环境..."
+echo "步骤 1/7: 创建虚拟环境..."
 if [ -d "venv" ]; then
     echo "⚠️  虚拟环境已存在，跳过创建"
 else
@@ -37,33 +37,35 @@ echo "✓ 虚拟环境已激活"
 echo ""
 
 # 步骤 2: 升级 pip
-echo "步骤 2/6: 升级 pip..."
+echo "步骤 2/7: 升级 pip..."
 pip install --upgrade pip --trusted-host pypi.org --trusted-host files.pythonhosted.org
 echo ""
 
-# 步骤 3: 安装修补版依赖包
-echo "步骤 3/6: 安装修补版依赖包..."
-echo "  安装 bertalign-macos-patched（从预构建的 wheel）..."
+# 步骤 3: 安装修补版 bertalign
+echo "步骤 3/7: 安装修补版 bertalign..."
 if [ -f "dist/bertalign_macos_patched-0.1.0.post1-py3-none-any.whl" ]; then
     pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org dist/bertalign_macos_patched-0.1.0.post1-py3-none-any.whl
 else
     echo "  ⚠️  未找到预构建的 wheel，从源码安装..."
     pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org ./patched_packages/bertalign-patched
 fi
-echo ""
-echo "  安装 fasttext-numpy2-patched..."
-pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org ./patched_packages/fasttext-patched
-echo "✓ 修补版依赖包安装完成"
+echo "✓ bertalign-macos-patched 安装完成"
 echo ""
 
-# 步骤 4: 安装其他依赖
-echo "步骤 4/6: 安装其他依赖..."
+# 步骤 4: 安装修补版 fasttext
+echo "步骤 4/7: 安装修补版 fasttext..."
+pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org ./patched_packages/fasttext-patched
+echo "✓ fasttext-numpy2-patched 安装完成"
+echo ""
+
+# 步骤 5: 安装其他依赖
+echo "步骤 5/7: 安装其他依赖..."
 pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org -r requirements.txt
 echo "✓ 依赖安装完成"
 echo ""
 
-# 步骤 5: 下载 LaBSE ONNX 模型
-echo "步骤 5/6: 下载 LaBSE ONNX 模型..."
+# 步骤 6: 下载 LaBSE ONNX 模型
+echo "步骤 6/7: 下载 LaBSE ONNX 模型..."
 if [ -f "labse_onnx/model.onnx" ]; then
     echo "⚠️  LaBSE ONNX 模型已存在，跳过下载"
 else
@@ -79,8 +81,8 @@ if not success:
 fi
 echo ""
 
-# 步骤 6: 下载 spaCy 语言模型
-echo "步骤 6/6: 下载 spaCy 语言模型..."
+# 步骤 7: 下载 spaCy 语言模型
+echo "步骤 7/7: 下载 spaCy 语言模型..."
 echo ""
 
 # 日语（ginza）
@@ -103,7 +105,7 @@ echo "==========================================================================
 echo ""
 echo "已安装的组件："
 echo "  ✓ bertalign-macos-patched（已移除 googletrans 和 sentence_splitter 依赖）"
-echo "  ✓ fasttext-numpy2-patched（NumPy 2.x 兼容）"
+echo "  ✓ fasttext-numpy2-patched（NumPy 2.x 兼容，用于语言检测）"
 echo "  ✓ LaBSE ONNX 模型（~1.8GB）"
 echo "  ✓ spaCy 日语模型（ja_ginza）"
 echo ""

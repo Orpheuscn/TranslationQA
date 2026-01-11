@@ -98,8 +98,13 @@ class TranslationQA:
                 # 🆕 获取检测到的语言（用于传递给 Bertalign，避免调用 Google Translate）
                 if source_language == 'auto' and self.text_splitter.language_detector:
                     detected_src_lang = self.text_splitter.language_detector.detect(source_text)
-                else:
+                    print(f"  检测到源语言: {detected_src_lang}")
+                elif source_language != 'auto':
                     detected_src_lang = source_language
+                else:
+                    # 如果是 'auto' 但语言检测器不可用，使用默认语言
+                    detected_src_lang = 'en'
+                    print(f"  ⚠️  语言检测不可用，使用默认源语言: {detected_src_lang}")
                 print(f"  源文本分句: {len(source_sents)}句")
             else:
                 source_sents = source_text
@@ -109,8 +114,13 @@ class TranslationQA:
                 # 🆕 获取检测到的语言（用于传递给 Bertalign，避免调用 Google Translate）
                 if target_language == 'auto' and self.text_splitter.language_detector:
                     detected_tgt_lang = self.text_splitter.language_detector.detect(target_text)
-                else:
+                    print(f"  检测到目标语言: {detected_tgt_lang}")
+                elif target_language != 'auto':
                     detected_tgt_lang = target_language
+                else:
+                    # 如果是 'auto' 但语言检测器不可用，使用默认语言
+                    detected_tgt_lang = 'zh'
+                    print(f"  ⚠️  语言检测不可用，使用默认目标语言: {detected_tgt_lang}")
                 print(f"  目标文本分句: {len(target_sents)}句")
             else:
                 target_sents = target_text
