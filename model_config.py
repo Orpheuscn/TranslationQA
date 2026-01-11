@@ -52,23 +52,15 @@ def setup_hanlp_env():
     """
     设置 HanLP 环境变量
     
-    如果项目本地有 HanLP 模型，设置 HANLP_HOME 环境变量
-    使 HanLP 优先使用本地模型
+    强制使用项目本地 models/hanlp/ 目录
     """
-    hanlp_home = get_hanlp_home()
+    # 确保目录存在
+    HANLP_LOCAL_DIR.mkdir(parents=True, exist_ok=True)
     
-    # 设置环境变量（仅当项目本地模型存在时）
-    if hanlp_home == HANLP_LOCAL_DIR and HANLP_LOCAL_DIR.exists():
-        os.environ['HANLP_HOME'] = str(hanlp_home.absolute())
-        print(f"✓ 使用本地 HanLP 模型: {hanlp_home}")
-        return True
-    elif hanlp_home != HANLP_LOCAL_DIR:
-        print(f"✓ 使用系统 HanLP 缓存: {hanlp_home}")
-        return False
-    else:
-        print(f"⚠️  本地 HanLP 模型不存在: {HANLP_LOCAL_DIR}")
-        print(f"   将使用系统默认缓存: {Path.home() / '.hanlp'}")
-        return False
+    # 强制设置为本地目录
+    os.environ['HANLP_HOME'] = str(HANLP_LOCAL_DIR.absolute())
+    print(f"✓ 使用本地 HanLP 目录: {HANLP_LOCAL_DIR}")
+    return True
 
 # ===== 模型信息 =====
 def get_models_info():

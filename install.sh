@@ -87,74 +87,80 @@ echo ""
 echo "步骤 7/8: 下载 spaCy 语言模型..."
 echo ""
 
-# 英语（常用）
-echo "  下载英语模型（en_core_web_sm）..."
-if python -c "import spacy; spacy.load('en_core_web_sm')" 2>/dev/null; then
-    echo "    ✓ en_core_web_sm 已安装，跳过"
-else
-    python -m spacy download en_core_web_sm --trusted-host pypi.org --trusted-host files.pythonhosted.org
-    echo "    ✓ en_core_web_sm 安装完成"
-fi
+# 定义所有需要安装的语言模型（除了中文使用 HanLP）
+declare -A SPACY_MODELS=(
+    ["en"]="en_core_web_sm"      # 英语
+    ["ja"]="ja_ginza"            # 日语（Ginza）
+    ["fr"]="fr_core_news_sm"     # 法语
+    ["de"]="de_core_news_sm"     # 德语
+    ["es"]="es_core_news_sm"     # 西班牙语
+    ["it"]="it_core_news_sm"     # 意大利语
+    ["pt"]="pt_core_news_sm"     # 葡萄牙语
+    ["nl"]="nl_core_news_sm"     # 荷兰语
+    ["el"]="el_core_news_sm"     # 希腊语
+    ["pl"]="pl_core_news_sm"     # 波兰语
+    ["ru"]="ru_core_news_sm"     # 俄语
+    ["ko"]="ko_core_news_sm"     # 韩语
+)
+
+# 安装所有模型
+for lang in "${!SPACY_MODELS[@]}"; do
+    model="${SPACY_MODELS[$lang]}"
+    echo "  下载 ${lang} 模型（${model}）..."
+    
+    if python -c "import spacy; spacy.load('${model}')" 2>/dev/null; then
+        echo "    ✓ ${model} 已安装，跳过"
+    else
+        if [ "$model" = "ja_ginza" ]; then
+            # ja_ginza 需要特殊安装
+            pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org ja-ginza
+        else
+            python -m spacy download ${model} --trusted-host pypi.org --trusted-host files.pythonhosted.org
+        fi
+        echo "    ✓ ${model} 安装完成"
+    fi
+    echo ""
+done
+
+echo "✓ 所有 spaCy 模型下载完成"
 echo ""
 
-# 中文使用 HanLP，不需要 spaCy 模型
+# 步骤 8: 配置环境变量和 HanLP
+echo "步骤 8/8: 配置环境变量和 HanLP..."
 
-# 日语（ginza）
-echo "  下载日语模型（ja_ginza）..."
-if python -c "import spacy; spacy.load('ja_ginza')" 2>/dev/null; then
-    echo "    ✓ ja_ginza 已安装，跳过"
-else
-    pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org ja-ginza
-    echo "    ✓ ja_ginza 安装完成"
-fi
-echo ""
+# 设置 HanLP 使用本地目录
+mkdir -p models/hanlp
+export HANLP_HOME="$(pwd)/models/hanlp"
 
-# 法语（常用）
-echo "  下载法语模型（fr_core_news_sm）..."
-if python -c "import spacy; spacy.load('fr_core_news_sm')" 2>/dev/null; then
-    echo "    ✓ fr_core_news_sm 已安装，跳过"
-else
-    python -m spacy download fr_core_news_sm --trusted-host pypi.org --trusted-host files.pythonhosted.org
-    echo "    ✓ fr_core_news_sm 安装完成"
-fi
-echo ""
-
-# 德语（常用）
-echo "  下载德语模型（de_core_news_sm）..."
-if python -c "import spacy; spacy.load('de_core_news_sm')" 2>/dev/null; then
-    echo "    ✓ de_core_news_sm 已安装，跳过"
-else
-    python -m spacy download de_core_news_sm --trusted-host pypi.org --trusted-host files.pythonhosted.org
-    echo "    ✓ de_core_news_sm 安装完成"
-fi
-echo ""
-
-# 西班牙语（常用）
-echo "  下载西班牙语模型（es_core_news_sm）..."
-if python -c "import spacy; spacy.load('es_core_news_sm')" 2>/dev/null; then
-    echo "    ✓ es_core_news_sm 已安装，跳过"
-else
-    python -m spacy download es_core_news_sm --trusted-host pypi.org --trusted-host files.pythonhosted.org
-    echo "    ✓ es_core_news_sm 安装完成"
-fi
-echo ""
-
-echo "✓ 所有模型下载完成"
-echo ""
-
-# 步骤 8: 设置环境变量（修复 OpenMP 冲突）
-echo "步骤 8/8: 配置环境变量..."
+# 添加环境变量到 activate 脚本
 ACTIVATE_SCRIPT="venv/bin/activate"
-if ! grep -q "KMP_DUPLICATE_LIB_OK" "$ACTIVATE_SCRIPT"; then
-    cat >> "$ACTIVATE_SCRIPT" << 'ENVEOF'
+if ! grep -q "HANLP_HOME" "$ACTIVATE_SCRIPT"; then
+    cat >> "$ACTIVATE_SCRIPT" << ENVEOF
 
-# 修复 OpenMP 运行时冲突
+# 项目环境变量
+export HANLP_HOME="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")/../.." && pwd)/models/hanlp"
 export KMP_DUPLICATE_LIB_OK=TRUE
 ENVEOF
-    echo "✓ 已添加 KMP_DUPLICATE_LIB_OK=TRUE 到 activate 脚本"
+    echo "✓ 已添加环境变量到 activate 脚本"
 else
     echo "⚠️  环境变量已设置，跳过"
 fi
+
+# 预下载 HanLP 模型（首次使用时会自动下载）
+echo ""
+echo "预初始化 HanLP（首次使用会下载模型，约 171MB）..."
+python -c "
+import os
+os.environ['HANLP_HOME'] = '$(pwd)/models/hanlp'
+try:
+    from hanlp.utils.rules import split_sentence
+    # 测试一下
+    list(split_sentence('这是测试。'))
+    print('✓ HanLP 初始化成功')
+except Exception as e:
+    print(f'⚠️  HanLP 初始化失败: {e}')
+    print('   HanLP 会在首次使用时自动下载模型')
+"
 echo ""
 
 # 完成
@@ -166,17 +172,14 @@ echo "已安装的组件："
 echo "  ✓ bertalign-macos-patched（已移除 googletrans 和 sentence_splitter 依赖）"
 echo "  ✓ fasttext-wheel（语言检测，包含预编译二进制）"
 echo "  ✓ LaBSE ONNX 模型（~1.8GB）"
-echo "  ✓ spaCy 模型："
-echo "    - 英语 (en_core_web_sm)"
-echo "    - 中文 (zh_core_web_sm)"
-echo "    - 日语 (ja_ginza)"
-echo "    - 法语 (fr_core_news_sm)"
-echo "    - 德语 (de_core_news_sm)"
-echo "    - 西班牙语 (es_core_news_sm)"
+echo "  ✓ HanLP（中文处理，安装在 models/hanlp/）"
+echo "  ✓ spaCy 模型（12种语言）："
+echo "    - 英语、日语、法语、德语、西班牙语、意大利语"
+echo "    - 葡萄牙语、荷兰语、希腊语、波兰语、俄语、韩语"
 echo ""
-echo "首次启动说明："
-echo "  - fastText 语言检测模型（~125MB）会在首次运行时自动下载"
-echo "  - HanLP 中文模型（~171MB）会在首次使用中文时自动下载"
+echo "环境变量："
+echo "  ✓ HANLP_HOME=$(pwd)/models/hanlp"
+echo "  ✓ KMP_DUPLICATE_LIB_OK=TRUE"
 echo ""
 echo "启动服务器："
 echo "  source venv/bin/activate"
