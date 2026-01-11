@@ -23,6 +23,7 @@ class TextSplitter:
     # 语言代码到 spaCy 模型的映射
     SPACY_MODELS = {
         'en': 'en_core_web_sm',      # 英语
+        'ja': 'ja_ginza',            # 日语 (GiNZA)
         'fr': 'fr_core_news_sm',     # 法语
         'de': 'de_core_news_sm',     # 德语
         'es': 'es_core_news_sm',     # 西班牙语
@@ -30,11 +31,8 @@ class TextSplitter:
         'pt': 'pt_core_news_sm',     # 葡萄牙语
         'nl': 'nl_core_news_sm',     # 荷兰语
         'el': 'el_core_news_sm',     # 希腊语
-        'fi': 'fi_core_news_sm',     # 芬兰语
-        'sv': 'sv_core_news_sm',     # 瑞典语
-        'da': 'da_core_news_sm',     # 丹麦语
+        'pl': 'pl_core_news_sm',     # 波兰语
         'ru': 'ru_core_news_sm',     # 俄语
-        'ja': 'ja_ginza',            # 日语 (GiNZA)
         'ko': 'ko_core_news_sm',     # 韩语
     }
 
@@ -96,9 +94,36 @@ class TextSplitter:
                 print(f"✓ spaCy 模型 ({model_name}) 加载成功")
                 return nlp
             except OSError:
-                print(f"⚠️  spaCy 模型 {model_name} 未安装")
-                print(f"   安装命令: python -m spacy download {model_name}")
-                return None
+                # 模型未安装，尝试自动下载
+                print(f"⚠️  spaCy 模型 {model_name} 未安装，正在自动下载...")
+                try:
+                    import subprocess
+                    import sys
+                    
+                    # 特殊处理 ja_ginza
+                    if model_name == 'ja_ginza':
+                        subprocess.check_call([sys.executable, "-m", "pip", "install", 
+                                             "--trusted-host", "pypi.org", 
+                                             "--trusted-host", "files.pythonhosted.org",
+                                             "ja-ginza"], 
+                                            stdout=subprocess.DEVNULL, 
+                                            stderr=subprocess.DEVNULL)
+                    else:
+                        subprocess.check_call([sys.executable, "-m", "spacy", "download", model_name,
+                                             "--trusted-host", "pypi.org",
+                                             "--trusted-host", "files.pythonhosted.org"],
+                                            stdout=subprocess.DEVNULL,
+                                            stderr=subprocess.DEVNULL)
+                    
+                    # 重新尝试加载
+                    nlp = spacy.load(model_name)
+                    self.spacy_models[language] = nlp
+                    print(f"✓ spaCy 模型 ({model_name}) 下载并加载成功")
+                    return nlp
+                except Exception as download_error:
+                    print(f"❌ 自动下载失败: {download_error}")
+                    print(f"   请手动安装: python -m spacy download {model_name}")
+                    return None
         except ImportError:
             print("⚠️  spaCy 未安装")
             print("   安装命令: pip install spacy")
@@ -170,10 +195,12 @@ class TextSplitter:
         """
         if self.hanlp_split_sentence:
             # 使用 HanLP 的规则分句器
+            print("  使用 HanLP 规则分句器（中文）")
             # split_sentence 返回生成器，需要转换为列表
             sentences = list(self.hanlp_split_sentence(text))
         else:
             # 使用简单规则分句
+            print("  ⚠️  HanLP 不可用，使用简单规则分句")
             sentences = self._simple_split_chinese(text)
 
         return [s for s in sentences if s]
