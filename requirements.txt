@@ -6,8 +6,11 @@ onnxruntime>=1.15.0
 # 数据处理
 pandas>=2.0.0
 
+# 语言检测
+# fasttext-wheel  # 通过 install.sh 单独安装，包含预编译二进制
+
 # Bertalign 依赖
-# bertalign  # 使用修补版 bertalign-macos-patched，需手动从 dist/ 或 patched_packages/ 安装
+# bertalign  # 使用修补版 bertalign-macos-patched，需手动从 dist/ 安装
 transformers>=4.30.0
 faiss-cpu>=1.7.0
 numba>=0.57.0
@@ -22,10 +25,16 @@ spacy>=3.7.0
 hanlp>=2.1.0
 
 # 注意：
-# 1. bertalign-macos-patched 和 fasttext-numpy2-patched 需要手动安装：
+# 1. bertalign-macos-patched 需要手动安装：
 #    pip install dist/bertalign_macos_patched-0.1.0.post1-py3-none-any.whl
-#    pip install ./patched_packages/fasttext-patched
 # 
-# 2. spaCy 语言模型需要单独下载（见 install.sh）
+# 2. fasttext-wheel 需要单独安装（包含预编译的 C++ 扩展）：
+#    pip install fasttext-wheel
 # 
-# 3. LaBSE ONNX 模型需要运行：python download_models.py
+# 3. spaCy 语言模型需要单独下载（见 install.sh）：
+#    python -m spacy download en_core_web_sm  # 英语
+#    python -m spacy download zh_core_web_sm  # 中文
+#    python -m spacy download ja_ginza        # 日语
+#    等等
+# 
+# 4. LaBSE ONNX 模型需要运行：python download_models.py

@@ -25,9 +25,10 @@ chmod +x install.sh
 
 安装脚本会自动完成：
 - 创建 Python 虚拟环境
-- 安装所有依赖（包括修补版 bertalign 和 fasttext）
+- 安装所有依赖（包括修补版 bertalign 和 fasttext-wheel）
 - 下载 LaBSE ONNX 模型（~1.8GB）
-- 下载 spaCy 日语模型
+- 下载 spaCy 语言模型（英语、中文、日语、法语、德语、西班牙语）
+- 配置环境变量（修复 OpenMP 冲突）
 
 ## 📦 手动安装
 
@@ -79,7 +80,7 @@ python app.py
   - 不再依赖 Google Translate API
   - 使用 fastText 进行语言检测
   - 使用项目自带的 spaCy/HanLP 进行分句
-- `fasttext-numpy2-patched` - NumPy 2.x 兼容版本
+- `fasttext-wheel` - 官方 fastText，包含预编译的 C++ 扩展
 
 ### Web 服务
 - `flask>=3.0.0` - Web 框架
@@ -88,7 +89,13 @@ python app.py
 ### NLP 工具
 - `spacy>=3.7.0` - 高级分句和 NLP
 - `hanlp>=2.1.0` - 中文处理
-- `ja-ginza` - spaCy 日语模型（可选）
+- spaCy 语言模型（自动安装）：
+  - `en_core_web_sm` - 英语
+  - `zh_core_web_sm` - 中文
+  - `ja_ginza` - 日语（Ginza）
+  - `fr_core_news_sm` - 法语
+  - `de_core_news_sm` - 德语
+  - `es_core_news_sm` - 西班牙语
 
 ### 模型文件（自动下载）
 - **LaBSE ONNX** (~1.8GB) - 语义嵌入，手动下载
