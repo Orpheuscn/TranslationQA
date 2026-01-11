@@ -60,6 +60,8 @@ echo ""
 
 # 步骤 5: 安装其他依赖
 echo "步骤 5/8: 安装其他依赖..."
+# 先安装 NumPy < 2.0（fasttext 要求）
+pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org 'numpy>=1.24.0,<2.0'
 pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org -r requirements.txt
 echo "✓ 依赖安装完成"
 echo ""

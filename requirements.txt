@@ -1,5 +1,5 @@
 # 核心依赖
-numpy>=1.24.0,<2.4  # numba 要求 numpy < 2.4
+numpy>=1.24.0,<2.0  # fasttext 要求 numpy < 2.0（避免 copy=False 错误）
 onnx>=1.14.0
 onnxruntime>=1.15.0
 
