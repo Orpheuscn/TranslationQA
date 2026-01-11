@@ -8,8 +8,8 @@ venv/
 env/
 ENV/
 *.egg-info/
-dist/
 build/
+# dist/ - 保留预构建的 wheel 包
 
 # 但是保留修改过的源代码文件
 !patched_packages/
@@ -39,6 +39,9 @@ models/hanlp/
 # LaBSE ONNX 模型文件（太大，不应提交到 git）
 labse_onnx/
 !labse_onnx/.gitkeep
+
+# Hugging Face 缓存
+.cache/
 
 # Logs
 *.log

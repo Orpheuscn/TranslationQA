@@ -1,17 +1,34 @@
 # 核心依赖
-numpy>=1.24.0
+numpy>=1.24.0,<2.4  # numba 要求 numpy < 2.4
 onnx>=1.14.0
 onnxruntime>=1.15.0
 
-# Bertalign和编码器
-bertalign
-transformers>=4.30.0
+# 数据处理
+pandas>=2.0.0
 
-# Web服务
+# Bertalign 依赖
+# bertalign  # 使用修补版 bertalign-macos-patched，需手动从 patched_packages/ 安装
+transformers>=4.30.0
+faiss-cpu>=1.7.0
+numba>=0.57.0
+torch>=1.6.0
+
+# 分句工具
+sentence-splitter>=1.4
+
+# Web 服务
 flask>=3.0.0
 flask-cors>=4.0.0
 
-# 高级分句
+# 高级分句和 NLP
 spacy>=3.7.0
 hanlp>=2.1.0
 
+# 注意：
+# 1. bertalign-macos-patched 和 fasttext-numpy2-patched 需要手动安装：
+#    pip install ./patched_packages/bertalign-patched
+#    pip install ./patched_packages/fasttext-patched
+# 
+# 2. spaCy 语言模型需要单独下载（见 install.sh）
+# 
+# 3. LaBSE ONNX 模型需要运行：python download_models.py

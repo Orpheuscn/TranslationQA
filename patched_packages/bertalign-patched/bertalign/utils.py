@@ -1,6 +1,6 @@
 import re
-from googletrans import Translator
-from sentence_splitter import SentenceSplitter
+# from googletrans import Translator  # 已移除：不再依赖 Google Translate
+# from sentence_splitter import SentenceSplitter  # 已移除：项目使用更高级的分句模型（spaCy/HanLP）
 
 def clean_text(text):
     clean_text = []
@@ -14,27 +14,32 @@ def clean_text(text):
     return "\n".join(clean_text)
     
 def detect_lang(text):
-    translator = Translator(service_urls=[
-      'translate.google.com.hk',
-    ])
-    max_len = 200
-    chunk = text[0 : min(max_len, len(text))]
-    lang = translator.detect(chunk).lang
-    if lang.startswith('zh'):
-        lang = 'zh'
-    return lang
+    """
+    语言检测函数（已弃用）
+    
+    注意：此函数已不再使用 Google Translate。
+    请在调用 Bertalign 时传入 src_lang 和 tgt_lang 参数。
+    如果未提供语言参数，将抛出异常。
+    """
+    raise NotImplementedError(
+        "detect_lang() 已弃用。请使用 fastText 或其他语言检测工具，"
+        "并在调用 Bertalign 时传入 src_lang 和 tgt_lang 参数。"
+    )
 
 def split_sents(text, lang):
-    if lang in LANG.SPLITTER:
-        if lang == 'zh':
-            sents = _split_zh(text)
-        else:
-            splitter = SentenceSplitter(language=lang)
-            sents = splitter.split(text=text) 
-            sents = [sent.strip() for sent in sents]
-        return sents
-    else:
-        raise Exception('The language {} is not suppored yet.'.format(LANG.ISO[lang]))
+    """
+    分句函数（已弃用）
+    
+    注意：此函数已不再使用 sentence_splitter。
+    TranslationQA 项目使用更高级的分句模型（spaCy/HanLP），
+    并在调用 Bertalign 时总是传入 is_split=True，因此此函数不会被调用。
+    
+    如果需要使用此函数，请在外部使用 spaCy/HanLP 等工具进行分句。
+    """
+    raise NotImplementedError(
+        "split_sents() 已弃用。请在外部使用 spaCy/HanLP 等工具进行分句，"
+        "然后调用 Bertalign 时传入 is_split=True。"
+    )
     
 def _split_zh(text, limit=1000):
         sent_list = []
